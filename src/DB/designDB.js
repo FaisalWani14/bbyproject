@@ -4,32 +4,38 @@ export const design = [
     {
     id: 1,
     name: "design1",
-    flower1: flowers[imgName('red')].img,
-    flower2: flowers[imgName('pink')].img,
-    flower3: flowers[imgName('red')].img,
-    flower4: flowers[imgName('sunflower')].img,
-    flower5: flowers[imgName('rose')].img,
-    flower6: flowers[imgName('sunflower')].img,
+    flowers: [
+        flowers[imgName('red')].img,
+        flowers[imgName('pink')].img,
+        flowers[imgName('red')].img,
+        flowers[imgName('sunflower')].img,
+        flowers[imgName('rose')].img,
+        flowers[imgName('sunflower')].img,
+        ]
     },
     {
     id: 2,
     name: "design2",
-    flower1: flowers[imgName('pink')].img,
-    flower2: flowers[imgName('sunflower')].img,
-    flower3: flowers[imgName('pink')].img,
-    flower4: flowers[imgName('rose')].img,
-    flower5: flowers[imgName('red')].img,
-    flower6: flowers[imgName('rose')].img,
+    flowers: [
+        flowers[imgName('pink')].img,
+        flowers[imgName('sunflower')].img,
+        flowers[imgName('pink')].img,
+        flowers[imgName('rose')].img,
+        flowers[imgName('red')].img,
+        flowers[imgName('rose')].img,
+        ]
     },
     {
     id: 3,
     name: "design3",
-    flower1: flowers[imgName('red')].img,
-    flower2: flowers[imgName('sunflower')].img,
-    flower3: flowers[imgName('sunflower')].img,
-    flower4: flowers[imgName('red')].img,
-    flower5: flowers[imgName('pink')].img,
-    flower6: flowers[imgName('pink')].img,
+    flowers: [
+        flowers[imgName('red')].img,
+        flowers[imgName('sunflower')].img,
+        flowers[imgName('sunflower')].img,
+        flowers[imgName('red')].img,
+        flowers[imgName('pink')].img,
+        flowers[imgName('pink')].img,
+        ]
     },
 ]
 

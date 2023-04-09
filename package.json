@@ -17,6 +17,7 @@
     "jquery": "^3.6.4",
     "pinia": "^2.0.33",
     "vue": "^3.2.13",
+    "vue-drag-resize": "^1.5.4",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {

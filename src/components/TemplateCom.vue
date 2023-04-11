@@ -1,19 +1,41 @@
 <template>
   <div class="page" @mouseup="drop()">
+    <div class="menu">
+      <div class="fonts">Fonts</div>
+      <div class="text_box">
+        <input
+          id="brand"
+          v-model="brand"
+          type="text"
+          :placeholder="design.brand.text"
+        />
+        <input
+          id="motto"
+          v-model="motto"
+          type="text"
+          :placeholder="design.motto.text"
+        />
+        <textarea
+          id="desc"
+          v-model="desc"
+          type="text"
+          :placeholder="design.desc.text"
+        />
+      </div>
+    </div>
     <div class="bg-view">
       <div class="view">
         <div class="text">
-          <p class="brand">Brand</p>
-          <p class="motto">motto</p>
-          <p class="description">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Error
-            accusantium doloremque fugiat natus
+          <p id="brand">{{ brand }}</p>
+          <p id="motto">{{ motto }}</p>
+          <p id="description">
+            {{ desc }}
           </p>
         </div>
         <div class="flowers" @click="bg_click()">
           <div
             class="resizable"
-            v-for="index in design[1].flowers.length"
+            v-for="index in design.flowers.length"
             :key="index"
             :id="index"
           >
@@ -24,7 +46,7 @@
             >
               <img
                 :src="
-                  require(`@/assets/flowersImg/${design[2].flowers[index - 1]}`)
+                  require(`@/assets/flowersImg/${design.flowers[index - 1]}`)
                 "
                 class="flower"
               />
@@ -32,7 +54,10 @@
           </div>
         </div>
         <div class="main-img">
-          <img src="@/assets/flowersImg/product.png" />
+          <img
+            class="img"
+            :src="require(`@/assets/flowersImg/${design.productImg}`)"
+          />
         </div>
       </div>
     </div>
@@ -41,17 +66,28 @@
 
 <script>
 import { flowers } from "@/assets/flowers";
-import { design } from "../DB/designDB";
+
 let zIn = 1;
 let mouse = false;
 document.addEventListener("mousedown", () => (mouse = false));
 document.addEventListener("mousemove", () => (mouse = true));
 
+document.addEventListener("mousedown", (e) => {
+  console.log(e.target.id);
+  if (e.target.id == "brand") {
+    this.brand = "";
+  } else if (e.target.id == "motto") {
+    this.motto = "";
+  } else if (e.target.id == "desc") {
+    this.desc = "";
+  }
+});
+
 export default {
+  props: { design: Object },
   setup() {
     return {
       flowers,
-      design,
     };
   },
   data() {
@@ -61,6 +97,9 @@ export default {
       clicked_flower: [],
       index: 0,
       prev_flower: 99,
+      brand: this.design.brand.text,
+      motto: this.design.motto.text,
+      desc: this.design.desc.text,
     };
   },
   methods: {
@@ -156,12 +195,66 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import url("https://fonts.googleapis.com/css2?family=Alkatra:wght@700&family=Poppins:wght@200&family=Roboto:ital@1&display=swap");
 @mixin prevent_select {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
 }
+.menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  padding: 2em;
+  border: 1px solid #000;
+  height: 79vh;
+  width: 400px;
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  border-top-right-radius: 50px;
+  background-color: gold;
+}
+.fonts {
+  border: 1px solid #000;
+  width: 300px;
+  height: 300px;
+  margin-bottom: 50px;
+}
+.text_box {
+  border: 1px solid #000;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  * {
+    margin: 0 auto;
+    margin-bottom: 2em;
+    word-wrap: break-word;
+    word-break: break-all;
+    width: fit-content;
+  }
+  #brand {
+    width: 80%;
+    height: 5em;
+  }
+  *::placeholder,
+  *[type="text"] {
+    height: 3em;
+    font-size: 20px;
+    text-align: center;
+    color: #000;
+  }
 
+  #motto {
+    height: 3em;
+  }
+  #desc {
+    width: 100%;
+    height: 4em;
+  }
+}
 .bg-view {
   max-width: 800px;
   margin: 0 auto;
@@ -181,23 +274,47 @@ export default {
   position: relative;
 }
 .text {
-  border: 1px solid red;
   max-height: 200px;
   display: flex;
   flex-direction: column;
   text-align: center;
   position: absolute;
   max-width: 280px;
+  top: 50px;
   left: 50%;
   z-index: 1;
   transform: translate(-50%, -50%);
+  * {
+    margin-bottom: -5px;
+    margin-inline: 20px;
+  }
+  #brand {
+    min-width: 240px;
+    text-align: right;
+    font-family: "Alkatra";
+    font-size: 2.5em;
+    margin-bottom: -1rem;
+  }
+  #motto {
+    font-family: "Poppins";
+    font-size: 1em;
+  }
+  #description {
+    line-height: 1em;
+    font-family: "Roboto";
+    font-size: 0.8em;
+  }
 }
 .main-img {
   position: absolute;
-  transform: scale(40%);
-  left: -200px;
+  transform: scale(50%);
   z-index: 0;
+  top: -8em;
+  .img {
+    width: 100%;
+  }
 }
+
 .flowers {
   margin: 30px;
   position: relative;

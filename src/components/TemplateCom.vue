@@ -1,34 +1,63 @@
 <template>
   <div class="page" @mouseup="drop()">
     <div class="menu">
-      <div class="fonts">Fonts</div>
+      <div id="fonts">
+        <span id="font_title">Font Style</span>
+        <!-- <select id="fontSelect" v-model="selectedFont" @click="loadFont()">
+          <option
+            class="options"
+            v-for="(option, index) in fontsOption"
+            :key="index"
+            :value="option"
+          >
+            {{ option }}
+          </option>
+        </select> -->
+        <select
+          v-model="selectedFont"
+          class="form-control"
+          id="fontSelect"
+          :required="true"
+        >
+          <option
+            v-for="option in fontsOption"
+            :key="option"
+            :value="option"
+            :selected="option == 'Roboto'"
+          >
+            {{ option }}
+          </option>
+        </select>
+      </div>
       <div class="text_box">
+        Edit text
         <input
           id="brand"
           v-model="brand"
           type="text"
-          :placeholder="design.brand.text"
+          @focus="brandCtr == 0 ? ((brand = ''), (brandCtr = 1)) : null"
         />
         <input
           id="motto"
           v-model="motto"
           type="text"
-          :placeholder="design.motto.text"
+          @focus="mottoCtr == 0 ? ((motto = ''), (mottoCtr = 1)) : null"
         />
         <textarea
           id="desc"
           v-model="desc"
           type="text"
-          :placeholder="design.desc.text"
+          @focus="descCtr == 0 ? ((desc = ''), (descCtr = 1)) : null"
         />
       </div>
+      <div class="elements"></div>
     </div>
     <div class="bg-view">
       <div class="view">
         <div class="text">
-          <p id="brand">{{ brand }}</p>
-          <p id="motto">{{ motto }}</p>
-          <p id="description">
+          <p id="brandView" @click="changeFont('brandView')">{{ brand }}</p>
+          <p id="mottoView" @click="changeFont('mottoView')">{{ motto }}</p>
+          <p id="descView" @click="changeFont('descView')">
             {{ desc }}
           </p>
         </div>
@@ -66,28 +95,33 @@
 
 <script>
 import { flowers } from "@/assets/flowers";
+const fontsOption = [
+  "Ariel",
+  "Inter",
+  "Kanit",
+  "Lora",
+  "Montserrat",
+  "Open Sans",
+  "Oswald",
+  "Playfair Display",
+  "Prompt",
+  "Roboto",
+  "Ubuntu",
+  "Halleyo Personal Use",
+];
+// fontsOption.sort();
 
 let zIn = 1;
 let mouse = false;
 document.addEventListener("mousedown", () => (mouse = false));
 document.addEventListener("mousemove", () => (mouse = true));
 
-document.addEventListener("mousedown", (e) => {
-  console.log(e.target.id);
-  if (e.target.id == "brand") {
-    this.brand = "";
-  } else if (e.target.id == "motto") {
-    this.motto = "";
-  } else if (e.target.id == "desc") {
-    this.desc = "";
-  }
-});
-
 export default {
   props: { design: Object },
   setup() {
     return {
       flowers,
+      fontsOption,
     };
   },
   data() {
@@ -97,9 +131,15 @@ export default {
       clicked_flower: [],
       index: 0,
       prev_flower: 99,
-      brand: this.design.brand.text,
-      motto: this.design.motto.text,
-      desc: this.design.desc.text,
+      brand: this.design.brand,
+      motto: this.design.motto,
+      desc: this.design.desc,
+      brandCtr: 0,
+      mottoCtr: 0,
+      descCtr: 0,
+      font1: "Open Sans",
+      fontEl: null,
+      selectedFont: "",
     };
   },
   methods: {
@@ -175,7 +215,6 @@ export default {
     },
     bg_click() {
       document.addEventListener("mousedown", (e) => {
-        console.log(e);
         let classN = e.srcElement.getAttribute("class");
         let check = classN != "drag" && classN != "resizable";
         if (check && this.index) {
@@ -184,18 +223,44 @@ export default {
         }
       });
     },
+    changeFont(id) {
+      this.fontEl = document.getElementById(id);
+      let font = window
+        .getComputedStyle(this.fontEl)
+        .getPropertyValue("font-family");
+      font = font.replace(/['"]+/g, "");
+      this.selectedFont = font;
+    },
+    loadFont() {
+      const fonts = document.getElementById("fontSelect");
+      fonts.style.fontFamily = this.selectedFont;
+    },
+  },
+  watch: {
+    selectedFont() {
+      if (this.fontEl) {
+        this.fontEl.style.fontFamily = this.selectedFont;
+      }
+      this.loadFont();
+    },
   },
   mounted() {
     for (let i = 0; i < 6; i += 1) {
       this.clicked_flower[i] = false;
     }
-    console.log(this.clicked_flower);
+    const fonts = document.getElementById("fontSelect");
+    for (let i = 0; i < fonts.childElementCount; i++) {
+      let font = fonts.children[i].value;
+      fonts.children[i].style.fontFamily = font;
+    }
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@import url("https://fonts.googleapis.com/css2?family=Alkatra:wght@700&family=Poppins:wght@200&family=Roboto:ital@1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter&family=Kanit:wght@300&family=Lora:wght@500&family=Montserrat:wght@300&family=Open+Sans&family=Oswald&family=Playfair+Display:wght@900&family=Prompt:wght@300&family=Roboto:wght@300&family=Ubuntu&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Roboto:wght@300&display=swap");
+@import url("https://fonts.cdnfonts.com/css/halleyo-personal-use");
 @mixin prevent_select {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
@@ -213,15 +278,30 @@ export default {
   bottom: 0px;
   left: 0;
   border-top-right-radius: 50px;
-  background-color: gold;
+  background-color: #ffef9d;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
-.fonts {
-  border: 1px solid #000;
+#fonts {
   width: 300px;
   height: 300px;
   margin-bottom: 50px;
+  text-align: center;
+  span {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+}
+#fontSelect {
+  border: #ffef9d;
+  size: 20px;
+  width: 300px;
+  font-size: 1.5em;
 }
 .text_box {
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: bold;
   border: 1px solid #000;
   width: 300px;
   height: 300px;
@@ -234,17 +314,20 @@ export default {
     word-wrap: break-word;
     word-break: break-all;
     width: fit-content;
+    border-radius: 10px;
   }
+
+  *[type="text"] {
+    height: 3em;
+    font-size: 15px;
+    text-align: center;
+    color: #000;
+    font-weight: 500;
+  }
+
   #brand {
     width: 80%;
     height: 5em;
-  }
-  *::placeholder,
-  *[type="text"] {
-    height: 3em;
-    font-size: 20px;
-    text-align: center;
-    color: #000;
   }
 
   #motto {
@@ -266,7 +349,7 @@ export default {
 }
 .view {
   height: 450px;
-  background: #00ffff;
+  background: #d5d2ef;
   border-radius: 20px;
   display: flex;
   justify-content: space-between;
@@ -274,35 +357,35 @@ export default {
   position: relative;
 }
 .text {
-  max-height: 200px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
   position: absolute;
   max-width: 280px;
-  top: 50px;
+  top: 10px;
   left: 50%;
   z-index: 1;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%);
   * {
-    margin-bottom: -5px;
-    margin-inline: 20px;
+    text-align: center;
+    margin-bottom: 0.2em;
   }
-  #brand {
-    min-width: 240px;
-    text-align: right;
-    font-family: "Alkatra";
-    font-size: 2.5em;
-    margin-bottom: -1rem;
+  #brandView {
+    font-family: "Playfair Display";
+    font-size: 1.5em;
   }
-  #motto {
-    font-family: "Poppins";
-    font-size: 1em;
+  #mottoView {
+    font-family: "Halleyo Personal Use";
+    font-size: 1.2em;
+    position: relative;
+    top: -3px;
   }
-  #description {
-    line-height: 1em;
+  #descView {
+    line-height: 1.2em;
     font-family: "Roboto";
     font-size: 0.8em;
+    position: relative;
+    top: 3px;
+  }
+  * {
+    border: 1px solid #000;
   }
 }
 .main-img {

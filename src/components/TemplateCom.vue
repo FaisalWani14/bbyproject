@@ -14,7 +14,12 @@
           id="fontSelect"
           :required="true"
         >
-          <option v-for="option in fontsOption" :key="option" :value="option">
+          <option
+            v-for="option in fontsOption"
+            :key="option"
+            :value="option"
+            class="fontOption"
+          >
             {{ option }}
           </option>
         </select>
@@ -46,7 +51,22 @@
           :key="flower"
           class="elementImg"
           :src="require(`@/assets/flowersImg/${flower.img}`)"
+          @click="changeFlower(flower)"
         />
+      </div>
+      <div class="importImg">
+        <span>Import Image</span>
+        <input
+          type="file"
+          name="product_image"
+          ref="uploadFile"
+          @change="handleUpload"
+          hidden
+        />
+        <btn class="uploadBtn" @click="$refs.uploadFile.click()"
+          ><b-icon-download style="margin-right: 20px"></b-icon-download> Import
+          here</btn
+        >
       </div>
     </div>
     <div class="bg-view">
@@ -80,10 +100,7 @@
           </div>
         </div>
         <div class="main-img">
-          <img
-            class="img"
-            :src="require(`@/assets/flowersImg/${design.productImg}`)"
-          />
+          <img class="img" :src="productImg" />
         </div>
       </div>
     </div>
@@ -143,6 +160,7 @@ export default {
       font1: "Open Sans",
       fontEl: null,
       selectedFont: "",
+      productImg: require(`@/assets/flowersImg/${this.design.productImg}`),
     };
   },
   methods: {
@@ -157,16 +175,18 @@ export default {
       // this.el.getAttribute("id");
     },
     onDrag({ movementX, movementY }) {
-      let getStyle = window.getComputedStyle(this.el);
-      if (
-        this.pickedUp &&
-        this.clicked_flower[this.el.getAttribute("id") - 1]
-      ) {
-        let left = parseInt(getStyle.left);
-        let top = parseInt(getStyle.top);
+      if (this.el) {
+        let getStyle = window.getComputedStyle(this.el);
+        if (
+          this.pickedUp &&
+          this.clicked_flower[this.el.getAttribute("id") - 1]
+        ) {
+          let left = parseInt(getStyle.left);
+          let top = parseInt(getStyle.top);
 
-        this.el.style.left = `${left + movementX}px`;
-        this.el.style.top = `${top + movementY}px`;
+          this.el.style.left = `${left + movementX}px`;
+          this.el.style.top = `${top + movementY}px`;
+        }
       }
     },
     clearBorder(index) {
@@ -217,10 +237,13 @@ export default {
     bg_click() {
       document.addEventListener("mousedown", (e) => {
         let classN = e.srcElement.getAttribute("class");
-        let check = classN != "drag" && classN != "resizable";
+        console.log(classN);
+        let check =
+          classN != "drag" && classN != "resizable" && classN != "elementImg";
         if (check && this.index) {
           this.clearBorder(this.index);
           this.clicked_flower[this.index - 1] = false;
+          this.el = null;
         }
         if (classN != "form-control" && this.fontEl) {
           this.fontEl.style.border = "0px none #000";
@@ -266,6 +289,7 @@ export default {
         if (this.index) {
           this.clearBorder(this.index);
           this.clicked_flower[this.index - 1] = false;
+          this.el = null;
         }
       });
     },
@@ -295,6 +319,34 @@ export default {
         link.target = "_blank";
         link.click();
       });
+    },
+    changeFlower(flower) {
+      if (this.el)
+        this.el.children[0].children[0].src = require(`@/assets/flowersImg/${flower.img}`);
+    },
+    handleUpload(event) {
+      const image = event.target.files[0];
+      const apiKey = "N8Y3iFxzYMHhMiFhKBH7B7V8";
+      const formData = new FormData();
+      formData.append("image_file", image);
+      formData.append("size", "auto");
+
+      fetch("https://api.remove.bg/v1.0/removebg", {
+        method: "POST",
+        headers: {
+          "X-Api-Key": apiKey,
+        },
+        body: formData,
+      })
+        .then((res) => {
+          return res.blob();
+        })
+        .then((finalRes) => {
+          console.log(finalRes);
+          var urlCreator = window.URL || window.webkitURL;
+          var imageUrl = urlCreator.createObjectURL(finalRes);
+          this.productImg = imageUrl;
+        }).catch;
     },
   },
   watch: {
@@ -343,7 +395,15 @@ export default {
   overflow: auto;
 }
 .menu::-webkit-scrollbar {
-  display: none;
+  width: 10px;
+}
+.menu::-webkit-scrollbar-track {
+  margin-block-start: 50px;
+  border-radius: 30px;
+}
+.menu::-webkit-scrollbar-thumb {
+  border-radius: 30px;
+  background: linear-gradient(transparent, #ffd600);
 }
 #fonts {
   width: 100%;
@@ -357,12 +417,8 @@ export default {
     font-size: 1.5em;
     width: 100%;
     margin-bottom: 30px;
-    option:hover {
-      font-size: 0.5em;
-    }
   }
 }
-
 .text_box {
   text-align: center;
   font-size: 1.5em;
@@ -380,30 +436,31 @@ export default {
     text-align: center;
     font-size: 15px;
     font-weight: 500;
+    border: none;
+    color: #717171;
   }
 
   #brandIn {
-    width: 15rem;
-    height: 100px;
+    width: 100%;
+    height: 50px;
     font-size: 20px;
   }
 
   #mottoIn {
     width: 100%;
-    height: 6em;
+    height: 50px;
+    font-size: 15px;
     overflow: auto;
     resize: none;
-  }
-  #mottoIn::-webkit-scrollbar {
-    display: none;
   }
   #descIn {
     width: 100%;
-    height: 6em;
+    height: 75px;
     overflow: auto;
     resize: none;
   }
-  #descIn::-webkit-scrollbar {
+
+  *::-webkit-scrollbar {
     display: none;
   }
 }
@@ -420,6 +477,29 @@ export default {
 }
 .elementImg:hover {
   border: 1px solid #000;
+  cursor: pointer;
+}
+.importImg {
+  font-size: 1.5em;
+  font-weight: bold;
+  width: 270px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  margin: 30px auto;
+}
+.uploadBtn {
+  border: 3px solid #848484;
+  width: 100%;
+  height: 50px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  color: #848484;
+}
+.uploadBtn:hover {
   cursor: pointer;
 }
 
@@ -480,11 +560,15 @@ export default {
 }
 .main-img {
   position: absolute;
-  transform: scale(50%);
+  left: 190px;
+  top: 70px;
+  width: 400px;
+  height: 400px;
   z-index: 0;
-  top: -8em;
+
   .img {
     width: 100%;
+    height: 100%;
   }
 }
 
@@ -550,7 +634,7 @@ export default {
   height: 100px;
   position: absolute;
   left: 500px;
-  cursor: auto;
+  cursor: default;
 }
 .downloadBtn,
 .cancelBtn {

@@ -1,6 +1,6 @@
 <template>
   <!-- <TemplateCom :design="useDesign"/> -->
-  <TemplateCom :design="useTemplate"/>
+  <TemplateCom :design="useTemplate" />
 </template>
 
 <script>
@@ -8,18 +8,16 @@
 import { template } from "../DB/templateDB";
 import TemplateCom from "./TemplateCom.vue";
 export default {
-  components: { TemplateCom},
+  components: { TemplateCom },
   setup() {
     // const useDesign = design[0]
-    const useTemplate = template[0]
+    const useTemplate = template[0];
     return {
       // useDesign,
-      useTemplate
+      useTemplate,
     };
   },
-  methods: {
-    
-  },
+  methods: {},
 };
 </script>
 

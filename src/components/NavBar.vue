@@ -37,8 +37,6 @@ export default {
   background-color: white;
 }
 .logo {
-  font-family: "Cedarville Cursive", cursive;
-  font-size: 3em !important;
 }
 .navbar-nav {
   display: flex;
@@ -47,23 +45,21 @@ export default {
 }
 
 .nav-item {
-  font-family: "Inter", sans-serif;
+  font-weight: bold;
   font-size: 1.2em;
   margin: 50px 50px;
-  padding: 10px;
   text-decoration: none;
   color: black;
   position: relative;
   border-radius: 30px;
-  line-height: 180%;
   padding: 0 15px;
 }
 .nav-item:hover {
-  background: #ffd600 !important;
-  border-radius: 30px !important;
-  color: #000 !important;
+  background: #ffd600;
+  border-radius: 30px;
+  color: #000;
 }
 .router-link-active {
-  background-color: #ffd600 !important;
+  background-color: #ffd600;
 }
 </style>

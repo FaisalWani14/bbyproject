@@ -69,6 +69,15 @@
         >
       </div>
     </div>
+    <div class="colorSet">
+      <span>COLOR SET:</span>
+      <button
+        v-for="color in colorSet"
+        :key="color"
+        :style="color.style"
+        @click="changeColorSet(color.color)"
+      ></button>
+    </div>
     <div class="bg-view">
       <div class="view" id="capture">
         <div class="text" id="textView">
@@ -100,7 +109,7 @@
           </div>
         </div>
         <div class="main-img">
-          <img class="img" :src="productImg" />
+          <img class="img" id="productImg" :src="productImg" />
         </div>
       </div>
     </div>
@@ -113,8 +122,11 @@
 
 <script>
 import html2canvas from "html2canvas";
-
 import { flowers } from "@/assets/flowers";
+let path1Color = "#f7e6f8";
+let path2Color = "#d4cfec";
+let path3Color = "#f7e6f8";
+
 const fontsOption = [
   "Ariel",
   "Inter",
@@ -130,6 +142,12 @@ const fontsOption = [
   "Halleyo Personal Use",
 ];
 // fontsOption.sort();
+const colorSet = [
+  { color: "#957282", style: "background-color: #957282" },
+  { color: "#468faf", style: "background-color: #468faf" },
+  { color: "#d91717", style: "background-color: #d91717" },
+  { color: "#c6ca00", style: "background-color: #c6ca00" },
+];
 
 let zIn = 1;
 let mouse = false;
@@ -142,6 +160,8 @@ export default {
     return {
       flowers,
       fontsOption,
+      colorSet,
+      svg1: "",
     };
   },
   data() {
@@ -177,16 +197,31 @@ export default {
     onDrag({ movementX, movementY }) {
       if (this.el) {
         let getStyle = window.getComputedStyle(this.el);
+        let left = parseInt(getStyle.left);
+        let top = parseInt(getStyle.top);
+        let height = parseInt(getStyle.height);
+        let width = parseInt(getStyle.width);
+        // console.log(top, height);
         if (
           this.pickedUp &&
-          this.clicked_flower[this.el.getAttribute("id") - 1]
+          this.clicked_flower[this.el.getAttribute("id") - 1] &&
+          left + movementX > -40 &&
+          left + movementX < 640 &&
+          // + 100 - parseInt(getStyle.width) &&
+          top + movementY > -10 &&
+          top + movementY < 340
+          // + 100 - parseInt(getStyle.height)
         ) {
-          let left = parseInt(getStyle.left);
-          let top = parseInt(getStyle.top);
-
-          this.el.style.left = `${left + movementX}px`;
-          this.el.style.top = `${top + movementY}px`;
+          if (top + height > 440) {
+            this.el.style.top = `${top - height + 440 - top}px`;
+          } else this.el.style.top = `${top + movementY}px`;
+          if (left + width > 740) {
+            this.el.style.left = `${left - width + 740 - left}px`;
+          } else this.el.style.left = `${left + movementX}px`;
         }
+        this.el.addEventListener("mouseleave", () => {
+          this.pickedUp = false;
+        });
       }
     },
     clearBorder(index) {
@@ -237,7 +272,6 @@ export default {
     bg_click() {
       document.addEventListener("mousedown", (e) => {
         let classN = e.srcElement.getAttribute("class");
-        console.log(classN);
         let check =
           classN != "drag" && classN != "resizable" && classN != "elementImg";
         if (check && this.index) {
@@ -293,6 +327,25 @@ export default {
         }
       });
     },
+    changeColorSet(color) {
+      path1Color = color;
+      path3Color = color;
+      this.svg1 =
+        '<svg id="visual" viewBox="0 0 780 450" width="780" height="450" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"><path id="path1" d="M0 199L26 207.3C52 215.7 104 232.3 156 213.7C208 195 260 141 312 153C364 165 416 243 468 246C520 249 572 177 624 136.5C676 96 728 87 754 82.5L780 78L780 0L754 0C728 0 676 0 624 0C572 0 520 0 468 0C416 0 364 0 312 0C260 0 208 0 156 0C104 0 52 0 26 0L0 0Z" fill="' +
+        path1Color +
+        '"></path><path id="path2" d="M0 303L26 320.2C52 337.3 104 371.7 156 370.2C208 368.7 260 331.3 312 331.3C364 331.3 416 368.7 468 371.7C520 374.7 572 343.3 624 324.7C676 306 728 300 754 297L780 294L780 76L754 80.5C728 85 676 94 624 134.5C572 175 520 247 468 244C416 241 364 163 312 151C260 139 208 193 156 211.7C104 230.3 52 213.7 26 205.3L0 197Z" fill="' +
+        path2Color +
+        '"></path><path id="path3" d="M0 451L26 451C52 451 104 451 156 451C208 451 260 451 312 451C364 451 416 451 468 451C520 451 572 451 624 451C676 451 728 451 754 451L780 451L780 292L754 295C728 298 676 304 624 322.7C572 341.3 520 372.7 468 369.7C416 366.7 364 329.3 312 329.3C260 329.3 208 366.7 156 368.2C104 369.7 52 335.3 26 318.2L0 301Z" fill="' +
+        path3Color +
+        '"></path></svg>';
+
+      let path = document.getElementById("capture");
+      var encoded = window.btoa(this.svg1);
+      path.style.background = "url(data:image/svg+xml;base64," + encoded + ")";
+      // layer1.children[0].props.fill = color;
+      // layer1.children[1].props.fill = color
+      // layer1.children[2].props.fill = color;
+    },
     changeFont(id) {
       this.fontEl = document.getElementById(id);
       let elStyle = window.getComputedStyle(this.fontEl);
@@ -325,28 +378,39 @@ export default {
         this.el.children[0].children[0].src = require(`@/assets/flowersImg/${flower.img}`);
     },
     handleUpload(event) {
-      const image = event.target.files[0];
-      const apiKey = "N8Y3iFxzYMHhMiFhKBH7B7V8";
-      const formData = new FormData();
-      formData.append("image_file", image);
-      formData.append("size", "auto");
+      const selectedfile = event.target.files;
+      if (selectedfile.length > 0) {
+        const [imageFile] = selectedfile;
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+          const srcData = fileReader.result;
+          console.log("base64:", srcData);
+          document.getElementById("productImg").setAttribute("src", srcData);
+          this.productImg = srcData;
+        };
+        fileReader.readAsDataURL(imageFile);
+      }
+      // const apiKey = "N8Y3iFxzYMHhMiFhKBH7B7V8";
+      // const formData = new FormData();
+      // formData.append("image_file", image);
+      // formData.append("size", "auto");
 
-      fetch("https://api.remove.bg/v1.0/removebg", {
-        method: "POST",
-        headers: {
-          "X-Api-Key": apiKey,
-        },
-        body: formData,
-      })
-        .then((res) => {
-          return res.blob();
-        })
-        .then((finalRes) => {
-          console.log(finalRes);
-          var urlCreator = window.URL || window.webkitURL;
-          var imageUrl = urlCreator.createObjectURL(finalRes);
-          this.productImg = imageUrl;
-        }).catch;
+      // fetch("https://api.remove.bg/v1.0/removebg", {
+      //   method: "POST",
+      //   headers: {
+      //     "X-Api-Key": apiKey,
+      //   },
+      //   body: formData,
+      // })
+      //   .then((res) => {
+      //     return res.blob();
+      //   })
+      //   .then((finalRes) => {
+      //     console.log(finalRes);
+      //     var urlCreator = window.URL || window.webkitURL;
+      //     var imageUrl = urlCreator.createObjectURL(finalRes);
+      //     this.productImg = imageUrl;
+      //   }).catch();
     },
   },
   watch: {
@@ -502,7 +566,26 @@ export default {
 .uploadBtn:hover {
   cursor: pointer;
 }
-
+.colorSet {
+  height: 50px;
+  width: fit-content;
+  position: relative;
+  left: 500px;
+  display: flex;
+  span {
+    margin-block: auto;
+    font-weight: bold;
+    font-size: 15px;
+    margin-right: 10px;
+  }
+  button {
+    border: 0px none #fff;
+    border-radius: 100%;
+    height: 25px;
+    width: 25px;
+    margin: auto 5px;
+  }
+}
 .bg-view {
   max-width: 800px;
   margin: 0 auto;
@@ -524,6 +607,13 @@ export default {
   justify-content: space-between;
   align-items: center;
   position: relative;
+
+  aspect-ratio: 780 / 450;
+  width: 100%;
+  background-image: url("./layer1.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 .text {
   position: absolute;

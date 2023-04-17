@@ -4,11 +4,8 @@
     @click="bg_click()"
     @mouseup="drop()"
     @keyup.enter="bg_click()"
-    v-if="dataReady"
   >
-    NEW
     <div class="menu">
-      {{ design }}
       <div id="fonts">
         <span id="font_title">Font Style</span>
         <select
@@ -34,25 +31,24 @@
           v-model="brand"
           type="text"
           @focus="brandCtr == 0 ? ((brand = ''), (brandCtr = 1)) : null"
-        />
+        />{{ brand }}
         <textarea
           id="mottoIn"
           v-model="motto"
           @focus="mottoCtr == 0 ? ((motto = ''), (mottoCtr = 1)) : null"
-        />
+        />{{ motto }}
         <textarea
           scrollable
           id="descIn"
           v-model="desc"
           @focus="descCtr == 0 ? ((desc = ''), (descCtr = 1)) : null"
-        />
+        />{{ desc }}
       </div>
       <div class="elements">
         <span>Elements</span>
         <img
           v-for="flower in flowers"
           :key="flower"
-          :id="flower"
           class="elementImg"
           :src="require(`@/assets/flowersImg/${flower.img}`)"
           @click="changeFlower(flower)"
@@ -73,43 +69,7 @@
         >
       </div>
     </div>
-    <div class="bg-view" id="bg-capture">
-      <div class="view" id="capture">
-        <div class="text" id="textView">
-          <p id="brandView" @click="changeFont('brandView')">{{ brand }}</p>
-          <p id="mottoView" @click="changeFont('mottoView')">{{ motto }}</p>
-          <p id="descView" @click="changeFont('descView')">
-            {{ desc }}
-          </p>
-        </div>
-        <div class="flowers">
-          <div
-            class="resizable"
-            v-for="index in design.flowers.length"
-            :key="index"
-            :id="index"
-          >
-            <div
-              class="drag"
-              @mousedown="drag(index)"
-              @click="select_flower(index)"
-            >
-              <img
-                :src="
-                  require(`@/assets/flowersImg/${
-                    design.flowers[index - 1].img
-                  }`)
-                "
-                class="flower"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="main-img">
-          <img class="img" id="productImg" :src="productImg" />
-        </div>
-      </div>
-    </div>
+    <div class="bg-view" id="bg-view"></div>
     <div class="btn">
       <b-btn class="downloadBtn" @click="save()">Save</b-btn>
       <b-btn class="cancelBtn" @click="cancelBtn()">Cancel</b-btn>
@@ -144,7 +104,6 @@ document.addEventListener("mousedown", () => (mouse = false));
 document.addEventListener("mousemove", () => (mouse = true));
 
 export default {
-  props: ["design"],
   setup() {
     return {
       flowers,
@@ -167,8 +126,8 @@ export default {
       descCtr: 0,
       fontEl: null,
       selectedFont: "",
-      saveDesign: JSON.parse(JSON.stringify(this.design)),
-      productImg: require(`@/assets/flowersImg/${this.design.productImg}`),
+      saveDesign: {},
+      productImg: "",
       dataReady: false,
     };
   },
@@ -265,18 +224,18 @@ export default {
           this.fontEl = null;
         }
         let idN = e.srcElement.getAttribute("id");
-        if (this.brand == "" && idN != "brandIn") {
-          this.brand = this.saveDesign.brand.text;
-          this.brandCtr = 0;
-        }
-        if (this.motto == "" && idN != "mottoIn") {
-          this.motto = this.saveDesign.motto.text;
-          this.mottoCtr = 0;
-        }
-        if (this.desc == "" && idN != "descIn") {
-          this.desc = this.saveDesign.desc.text;
-          this.descCtr = 0;
-        }
+        // if (this.brand == "" && idN != "brandIn") {
+        //   this.brand = this.saveDesign.brand;
+        //   this.brandCtr = 0;
+        // }
+        // if (this.motto == "" && idN != "mottoIn") {
+        //   this.motto = this.saveDesign.motto;
+        //   this.mottoCtr = 0;
+        // }
+        // if (this.desc == "" && idN != "descIn") {
+        //   this.desc = this.saveDesign.desc;
+        //   this.descCtr = 0;
+        // }
 
         check = idN == "brandIn" || idN == "mottoIn" || idN == "descIn";
         if (check) {
@@ -294,7 +253,6 @@ export default {
           let elStyle = window.getComputedStyle(this.fontEl);
           let font = elStyle.getPropertyValue("font-family");
           font = font.replace(/['"]+/g, "");
-          console.log(font);
           this.selectedFont = font;
           this.fontEl.style.border = "1px solid #000";
         }
@@ -326,6 +284,8 @@ export default {
       fonts.style.fontFamily = this.selectedFont;
     },
     save() {
+      this.useDesignStore.design = [];
+      this.useDesignStore.html = [];
       let temp = this.productImg;
       console.log(temp);
       this.saveDesign.brand.text = this.brand;
@@ -348,10 +308,6 @@ export default {
       this.saveDesign.productImg = this.productImg;
 
       this.useDesignStore.design = this.saveDesign;
-
-      console.log("Temp" + temp);
-      console.log("DESIGN", this.design);
-      console.log("SAVEDESIGN", this.saveDesign);
 
       html2canvas(document.querySelector("#capture")).then((canvas) => {
         var link = document.createElement("a");
@@ -377,10 +333,10 @@ export default {
       });
     },
     cancelBtn() {
-      const html = document.getElementById("bg-capture").innerHTML;
-      // const canvas = new DOMParser().parseFromString(html, "text/html");
-      // let doc = canvas.children[0].children[1].children[0];
-      this.useDesignStore.html.push(html);
+      const html = document.getElementById("capture").innerHTML;
+      const canvas = new DOMParser().parseFromString(html, "text/html");
+      const bg = document.getElementById("test");
+      bg.appendChild(canvas.children[0].children[1]);
     },
     changeFlower(flower) {
       if (this.el) {
@@ -434,18 +390,53 @@ export default {
       //   .catch();
     },
     getDesign() {
-      this.brand = this.saveDesign.brand.text;
-      this.motto = this.saveDesign.motto.text;
-      this.desc = this.saveDesign.desc.text;
+      let html = this.useDesignStore.html;
+      const canvas = new DOMParser().parseFromString(html, "text/html");
+      let doc = canvas.children[0].children[1].children[0];
+      const bg = document.getElementById("bg-view");
+      console.log(doc);
+      bg.appendChild(doc);
+
+      this.brand = document.getElementById("brandView").innerHTML;
+      this.motto = document.getElementById("mottoView").innerHTML;
+      this.desc = document.getElementById("descView").innerHTML;
+      for (let i = 1; i < 7; i++) {
+        let flower = document.getElementById(i);
+        flower.addEventListener("click", () => {
+          let index = i;
+          this.index = index;
+          this.el = document.getElementById(i);
+          this.select_flower(index);
+          this.drag(index);
+          console.log(this.index, this.el, this.pickedUp);
+        });
+      }
     },
     setDesign() {
-      console.log(this.saveDesign.productImg);
-      document.getElementById("brandView").style.fontFamily =
-        this.saveDesign.brand.font;
-      document.getElementById("mottoView").style.fontFamily =
-        this.saveDesign.motto.font;
-      document.getElementById("descView").style.fontFamily =
-        this.saveDesign.desc.font;
+      const page = document.querySelector(".page");
+      page.addEventListener("click", this.bg_click);
+      page.addEventListener("mouseup", this.drop);
+      page.addEventListener("keyup.enter", this.bg_click);
+
+      const elementImg = document.querySelector(".elements");
+      console.log(elementImg);
+      elementImg.addEventListener("click", this.changeFlower);
+
+      const texts = document.querySelector("#textView");
+      for (let i = 0; i < texts.childElementCount; i++) {
+        texts.children[i].addEventListener("click", this.changeFont);
+      }
+
+      const drag = document.querySelector(".drag");
+      drag.addEventListener("mousedown", this.drag);
+      drag.addEventListener("click", this.select_flower);
+      // console.log(this.saveDesign.productImg);
+      // document.getElementById("brandView").style.fontFamily =
+      //   this.saveDesign.brand.font;
+      // document.getElementById("mottoView").style.fontFamily =
+      //   this.saveDesign.motto.font;
+      // document.getElementById("descView").style.fontFamily =
+      //   this.saveDesign.desc.font;
       // document
       //   .getElementById("productImg")
       //   .setAttribute(
@@ -457,9 +448,6 @@ export default {
       let i;
       for (i = 0; i < 6; i += 1) {
         this.clicked_flower[i] = false;
-        console.log(this.design.flowers[i].img);
-        document.getElementById(i + 1).children[0].children[0].img =
-          this.design.flowers[i].img;
       }
       const fonts = document.getElementById("fontSelect");
       for (i = 0; i < fonts.childElementCount; i++) {
@@ -477,11 +465,13 @@ export default {
       }
       this.loadFont();
     },
+    // brand() {
+    //   document.getElementById("brandView").innerHTML = this.brand;
+    // },
   },
-  async mounted() {
-    await this.getDesign();
-    this.dataReady = true;
-    await console.log("hi");
+  mounted() {
+    console.log(this.useDesignStore.html);
+    this.getDesign();
     this.setDesign();
   },
 };

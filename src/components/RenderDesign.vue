@@ -1,21 +1,13 @@
 <template>
-  <!-- <TemplateCom :design="useDesign"/> -->
-  <TemplateCom :design="useTemplate" />
+  <DesignCom />
 </template>
 
 <script>
-// import { design } from "../DB/designDB.js";
-import { template } from "../DB/templateDB";
-import TemplateCom from "./TemplateCom.vue";
+import DesignCom from "./DesignCom.vue";
 export default {
-  components: { TemplateCom },
+  components: { DesignCom },
   setup() {
-    // const useDesign = design[0]
-    const useTemplate = template[0];
-    return {
-      // useDesign,
-      useTemplate,
-    };
+    return {};
   },
   methods: {},
 };

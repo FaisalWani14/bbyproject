@@ -1,9 +1,13 @@
 <template>
-  <h1>HOME PAGE</h1>
+  <Design />
 </template>
 
 <script>
-export default {};
+import Design from "../components/RenderDesign.vue";
+
+export default {
+  components: { Design },
+};
 </script>
 
 <style></style>

@@ -4,16 +4,16 @@ export const template = [
     {
     id: 1,
     name: "template1",
-    brand: "BRAND NAME",
-    motto: "Let your beeuaty shine",
-    desc: "This is description section to display text on the screen and itds so cool",
+    brand: {text: "TEMPLATE", font: "Playfair Display"},
+    motto: {text: "Template Template",font: "Halleyo Personal Use"},
+    desc: {text: "Template template template template template",font: "Roboto"},
     flowers: [
-        flowers[imgName('red')].img,
-        flowers[imgName('red')].img,
-        flowers[imgName('red')].img,
-        flowers[imgName('red')].img,
-        flowers[imgName('red')].img,
-        flowers[imgName('red')].img,
+        {img: flowers[imgName('red')].img, left: 0, top: 0},
+        {img: flowers[imgName('red')].img, left: 0, top: 0},
+        {img: flowers[imgName('red')].img, left: 0, top: 0},
+        {img: flowers[imgName('red')].img, left: 0, top: 0},
+        {img: flowers[imgName('red')].img, left: 0, top: 0},
+        {img: flowers[imgName('red')].img, left: 0, top: 0},        
         ],
     productImg: 'product.png'
     }

@@ -5,7 +5,7 @@
 </template>
 <script>
 import { defineComponent } from "vue";
-import Template from "../components/RenderDesign.vue";
+import Template from "../components/RenderTemplate.vue";
 export default defineComponent({
   components: { Template },
   setup() {

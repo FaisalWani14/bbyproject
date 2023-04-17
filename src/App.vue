@@ -19,4 +19,3 @@ export default defineComponent({
   -moz-osx-font-smoothing: grayscale;
 }
 </style>
-

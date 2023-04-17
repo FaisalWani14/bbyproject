@@ -1,9 +1,12 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <TestTest />
   </div>
 </template>
 <script>
-export default {};
+import TestTest from "../components/TestTest.vue";
+export default {
+  components: { TestTest },
+};
 </script>
 <style></style>

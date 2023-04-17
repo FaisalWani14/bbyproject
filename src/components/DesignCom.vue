@@ -6,9 +6,7 @@
     @keyup.enter="bg_click()"
     v-if="dataReady"
   >
-    NEW
     <div class="menu">
-      {{ design }}
       <div id="fonts">
         <span id="font_title">Font Style</span>
         <select
@@ -52,7 +50,6 @@
         <img
           v-for="flower in flowers"
           :key="flower"
-          :id="flower"
           class="elementImg"
           :src="require(`@/assets/flowersImg/${flower.img}`)"
           @click="changeFlower(flower)"
@@ -73,7 +70,7 @@
         >
       </div>
     </div>
-    <div class="bg-view" id="bg-capture">
+    <div class="bg-view">
       <div class="view" id="capture">
         <div class="text" id="textView">
           <p id="brandView" @click="changeFont('brandView')">{{ brand }}</p>
@@ -85,7 +82,7 @@
         <div class="flowers">
           <div
             class="resizable"
-            v-for="index in design.flowers.length"
+            v-for="index in saveDesign.flowers.length"
             :key="index"
             :id="index"
           >
@@ -97,7 +94,7 @@
               <img
                 :src="
                   require(`@/assets/flowersImg/${
-                    design.flowers[index - 1].img
+                    saveDesign.flowers[index - 1].img
                   }`)
                 "
                 class="flower"
@@ -106,13 +103,13 @@
           </div>
         </div>
         <div class="main-img">
-          <img class="img" id="productImg" :src="productImg" />
+          <img class="img" id="productImg" src="productImg" />
         </div>
       </div>
     </div>
     <div class="btn">
       <b-btn class="downloadBtn" @click="save()">Save</b-btn>
-      <b-btn class="cancelBtn" @click="cancelBtn()">Cancel</b-btn>
+      <b-btn class="cancelBtn">Cancel</b-btn>
     </div>
   </div>
 </template>
@@ -144,7 +141,7 @@ document.addEventListener("mousedown", () => (mouse = false));
 document.addEventListener("mousemove", () => (mouse = true));
 
 export default {
-  props: ["design"],
+  props: { design: Object },
   setup() {
     return {
       flowers,
@@ -159,16 +156,16 @@ export default {
       clicked_flower: [],
       index: 0,
       prev_flower: 99,
-      brand: "",
-      motto: "",
-      desc: "",
+      brand: null,
+      motto: null,
+      desc: null,
       brandCtr: 0,
       mottoCtr: 0,
       descCtr: 0,
       fontEl: null,
       selectedFont: "",
-      saveDesign: JSON.parse(JSON.stringify(this.design)),
-      productImg: require(`@/assets/flowersImg/${this.design.productImg}`),
+      productImg: null,
+      saveDesign: {},
       dataReady: false,
     };
   },
@@ -204,7 +201,7 @@ export default {
       }
     },
     clearBorder(index) {
-      if (window.location.pathname == "/template") {
+      if (window.location.pathname == "/") {
         let prev = document.getElementById(index);
         prev.style.resize = "none";
         prev.style.overflow = "auto";
@@ -294,7 +291,6 @@ export default {
           let elStyle = window.getComputedStyle(this.fontEl);
           let font = elStyle.getPropertyValue("font-family");
           font = font.replace(/['"]+/g, "");
-          console.log(font);
           this.selectedFont = font;
           this.fontEl.style.border = "1px solid #000";
         }
@@ -326,33 +322,6 @@ export default {
       fonts.style.fontFamily = this.selectedFont;
     },
     save() {
-      let temp = this.productImg;
-      console.log(temp);
-      this.saveDesign.brand.text = this.brand;
-      this.saveDesign.brand.font = window
-        .getComputedStyle(document.getElementById("brandView"))
-        .fontFamily.replace(/['"]+/g, "");
-      this.saveDesign.motto.text = this.motto;
-      this.saveDesign.motto.font = window
-        .getComputedStyle(document.getElementById("mottoView"))
-        .fontFamily.replace(/['"]+/g, "");
-      this.saveDesign.desc.text = this.desc;
-      this.saveDesign.desc.font = window
-        .getComputedStyle(document.getElementById("descView"))
-        .fontFamily.replace(/['"]+/g, "");
-      for (let i = 0; i < 6; i++) {
-        let flower = window.getComputedStyle(document.getElementById(i + 1));
-        this.saveDesign.flowers[i].left = flower.left;
-        this.saveDesign.flowers[i].top = flower.top;
-      }
-      this.saveDesign.productImg = this.productImg;
-
-      this.useDesignStore.design = this.saveDesign;
-
-      console.log("Temp" + temp);
-      console.log("DESIGN", this.design);
-      console.log("SAVEDESIGN", this.saveDesign);
-
       html2canvas(document.querySelector("#capture")).then((canvas) => {
         var link = document.createElement("a");
         let imgUrl = canvas.toDataURL();
@@ -360,8 +329,28 @@ export default {
         link.download = "download.jpg";
         link.href = imgUrl;
         link.target = "_blank";
-
         // link.click();
+        this.saveDesign.brand.text = this.brand;
+        this.saveDesign.brand.font = window
+          .getComputedStyle(document.getElementById("brandView"))
+          .fontFamily.replace(/['"]+/g, "");
+        this.saveDesign.motto.text = this.motto;
+        this.saveDesign.motto.font = window
+          .getComputedStyle(document.getElementById("mottoView"))
+          .fontFamily.replace(/['"]+/g, "");
+        this.saveDesign.desc.text = this.desc;
+        this.saveDesign.desc.font = window
+          .getComputedStyle(document.getElementById("descView"))
+          .fontFamily.replace(/['"]+/g, "");
+        for (let i = 0; i < 6; i++) {
+          let flower = window.getComputedStyle(document.getElementById(i + 1));
+          this.saveDesign.flowers[i].left = flower.left;
+          this.saveDesign.flowers[i].top = flower.top;
+        }
+        this.saveDesign.productImg = this.productImg;
+
+        this.useDesignStore.design = this.saveDesign;
+
         // this.useDesignStore.designId = 1
         // this.useDesignStore.designName = "design2"
         // this.useDesignStore.designBrand = "FAISAL"
@@ -375,12 +364,6 @@ export default {
         // this.useDesignStore.designFlower6= 1
         // this.useDesignStore.designImg = 1
       });
-    },
-    cancelBtn() {
-      const html = document.getElementById("bg-capture").innerHTML;
-      // const canvas = new DOMParser().parseFromString(html, "text/html");
-      // let doc = canvas.children[0].children[1].children[0];
-      this.useDesignStore.html.push(html);
     },
     changeFlower(flower) {
       if (this.el) {
@@ -405,7 +388,6 @@ export default {
         fileReader.onload = () => {
           const srcData = fileReader.result;
           console.log("base64:", srcData);
-          document.getElementById("productImg").setAttribute("src", srcData);
           this.productImg = srcData;
         };
         fileReader.readAsDataURL(imageFile);
@@ -434,32 +416,30 @@ export default {
       //   .catch();
     },
     getDesign() {
+      this.saveDesign = this.useDesignStore.design;
       this.brand = this.saveDesign.brand.text;
       this.motto = this.saveDesign.motto.text;
       this.desc = this.saveDesign.desc.text;
     },
     setDesign() {
-      console.log(this.saveDesign.productImg);
       document.getElementById("brandView").style.fontFamily =
         this.saveDesign.brand.font;
       document.getElementById("mottoView").style.fontFamily =
         this.saveDesign.motto.font;
       document.getElementById("descView").style.fontFamily =
         this.saveDesign.desc.font;
-      // document
-      //   .getElementById("productImg")
-      //   .setAttribute(
-      //     "src",
-      //     require(`@/assets/flowersImg/${this.saveDesign.productImg}`)
-      //   );
-      // this.productImg = require(`@/assets/flowersImg/${this.saveDesign.productImg}`);
+      document
+        .getElementById("productImg")
+        .setAttribute("src", this.saveDesign.productImg);
 
+      for (let i = 1; i < 7; i++) {
+        let flower = document.getElementById(i);
+        flower.style.left = this.saveDesign.flowers[i - 1].left;
+        flower.style.top = this.saveDesign.flowers[i - 1].top;
+      }
       let i;
       for (i = 0; i < 6; i += 1) {
         this.clicked_flower[i] = false;
-        console.log(this.design.flowers[i].img);
-        document.getElementById(i + 1).children[0].children[0].img =
-          this.design.flowers[i].img;
       }
       const fonts = document.getElementById("fontSelect");
       for (i = 0; i < fonts.childElementCount; i++) {
@@ -483,6 +463,10 @@ export default {
     this.dataReady = true;
     await console.log("hi");
     this.setDesign();
+
+    console.log(this.saveDesign);
+    console.log(this.saveDesign.flowers);
+    console.log(this.saveDesign.flowers.length);
   },
 };
 </script>

@@ -47,7 +47,7 @@ export default {
 .nav-item {
   font-weight: bold;
   font-size: 1.2em;
-  margin: 50px 50px;
+  margin: 40px 50px;
   text-decoration: none;
   color: black;
   position: relative;

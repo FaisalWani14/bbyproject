@@ -569,7 +569,7 @@ export default {
 .colorSet {
   height: 50px;
   width: fit-content;
-  position: relative;
+  position: absolute;
   left: 500px;
   display: flex;
   span {
@@ -594,6 +594,7 @@ export default {
   background: #eeeeee;
   position: relative;
   left: 10%;
+  top: 60px;
   transition: ease background 2s;
 }
 .bg-view:hover {
@@ -650,15 +651,21 @@ export default {
 }
 .main-img {
   position: absolute;
-  left: 190px;
-  top: 70px;
-  width: 400px;
-  height: 400px;
+  width: 300px;
+  height: 300px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -35%);
   z-index: 0;
-
   .img {
     width: 100%;
-    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 
@@ -724,6 +731,7 @@ export default {
   height: 100px;
   position: absolute;
   left: 500px;
+  bottom: 5px;
   cursor: default;
 }
 .downloadBtn,

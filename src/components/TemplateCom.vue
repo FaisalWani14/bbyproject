@@ -6,7 +6,6 @@
     @keyup.enter="bg_click()"
     v-if="dataReady"
   >
-    NEW
     <div class="menu">
       {{ design }}
       <div id="fonts">
